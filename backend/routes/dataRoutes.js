@@ -1,31 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const Book = require('../models/Books');
+const {
+    getAllBooks,
+    getBookById,
+    createBook,
+    updateBook,
+    deleteBook
+} = require('../controllers/bookController');
 
-router.get('/', async (req, res) => {
-    try {
-        const books = await Book.find();
-        res.json(books);
-    } catch (err) {
-        res.json({ message: err });
-    }
-});
+router.get('/', getAllBooks);
 
-router.post('/', async (req, res) => {
-    const book = new Book({
-        title: req.body.title,
-        author: req.body.author,
-        publishedDate: req.body.publishedDate,
-        genre: req.body.genre,
-        summary: req.body.summary
-    });
+router.post('/books', createBook);
 
-    try {
-        const savedBook = await book.save();
-        res.json(savedBook);
-    } catch (err) {
-        res.json({ message: err });
-    }
-});
+router.get('/books/:bookId', getBookById);
+
+router.delete('/books/:bookId', deleteBook);
+
+router.put('/books/:bookId', updateBook);
+
+
 
 module.exports = router;
