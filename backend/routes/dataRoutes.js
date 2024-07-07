@@ -5,21 +5,21 @@ const {
     getBookById,
     createBook,
     updateBook,
-    deleteBook
+    deleteBook,
+    toggleWishlist
 } = require('../controllers/bookController');
 const upload = require('../middleware/upload');
 
-
-router.get('/', getAllBooks);
+router.get('/books', getAllBooks);
 
 router.post('/books', upload.single('coverImage'), createBook);
 
-router.get('/books/:bookId', upload.single('coverImage'), getBookById);
+router.get('/books/:bookId', getBookById);
 
 router.delete('/books/:bookId', deleteBook);
 
-router.put('/books/:bookId', updateBook);
+router.put('/books/:bookId', upload.single('coverImage'), updateBook);
 
-
+router.put('/:bookId/toggle-wishlist', toggleWishlist);
 
 module.exports = router;

@@ -25,6 +25,10 @@ const bookSchema = new mongoose.Schema({
     coverImage: {
         type: String,
         required: true
+    },
+    wishlist: {
+        type: Boolean,
+        default: false
     }
 });
 

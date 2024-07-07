@@ -5,9 +5,10 @@ const getAllBooks = async (req, res) => {
         const books = await Book.find();
         res.json(books);
     } catch (err) {
-        res.json({ message: err });
+        res.status(500).json({ message: err.message });
     }
-}
+};
+
 
 const getBookById = async (req, res) => {
     try {
@@ -19,22 +20,29 @@ const getBookById = async (req, res) => {
 };
 
 const createBook = async (req, res) => {
-    const book = new Book({
+    const bookData = {
         title: req.body.title,
         author: req.body.author,
         publishedDate: req.body.publishedDate,
         genre: req.body.genre,
         stock: req.body.stock,
-        coverImage: req.file.path
-    });
+        wishlist: req.body.wishlist
+    };
+
+    if (req.file) {
+        bookData.coverImage = `uploads/${req.file.filename}`;
+    }
+
+    const book = new Book(bookData);
 
     try {
         const savedBook = await book.save();
         res.json(savedBook);
     } catch (err) {
-        res.json({ message: err });
+        res.status(500).json({ message: err.message });
     }
 };
+
 
 const updateBook = async (req, res) => {
     try {
@@ -58,10 +66,27 @@ const deleteBook = async (req, res) => {
     }
 };
 
+const toggleWishlist = async (req, res) => {
+    try {
+        const book = await Book.findById(req.params.bookId);
+        if (!book) {
+            return res.status(404).json({ message: 'Book not found' });
+        }
+
+        book.wishlist = !book.wishlist;
+
+        const updatedBook = await book.save();
+        res.json(updatedBook);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
 module.exports = {
     getAllBooks,
     getBookById,
     createBook,
     updateBook,
-    deleteBook
+    deleteBook,
+    toggleWishlist
 };
