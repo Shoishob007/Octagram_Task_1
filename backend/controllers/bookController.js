@@ -24,7 +24,8 @@ const createBook = async (req, res) => {
         author: req.body.author,
         publishedDate: req.body.publishedDate,
         genre: req.body.genre,
-        summary: req.body.summary
+        stock: req.body.stock,
+        coverImage: req.file.path
     });
 
     try {

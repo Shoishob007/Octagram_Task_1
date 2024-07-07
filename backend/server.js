@@ -6,7 +6,6 @@ const { applyMiddleware, errorHandler } = require('./middleware/middleware');
 
 const app = express();
 
-const { applyMiddleware } = require('./middleware/middleware');
 applyMiddleware(app);
 
 app.use('/api', dataRoutes);

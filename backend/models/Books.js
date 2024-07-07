@@ -17,7 +17,12 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    summary: {
+    stock: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    coverImage: {
         type: String,
         required: true
     }
