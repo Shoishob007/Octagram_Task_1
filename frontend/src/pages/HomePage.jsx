@@ -3,17 +3,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Pagination from "../components/Pagination";
-import { BiEdit, BiTrash } from "react-icons/bi";
+import { BiEdit, BiTrash, BiPlus } from "react-icons/bi";
+import AddBookModal from "../components/AddBookModal";
 
 const Home = () => {
   const [books, setBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/books");
+        const response = await axios.get("http://localhost:3000/api/");
         console.log(response);
         const { data } = response;
         console.log(data);
@@ -34,15 +36,32 @@ const Home = () => {
     };
 
     fetchBooks();
+    return fetchBooks;
   }, []);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 relative">
       <h1 className="text-4xl font-bold text-center mb-8">All Books</h1>
+      <div className="fixed bottom-10 right-10 mb-4">
+        <button
+          onClick={openModal}
+          className="bg-blue-800 text-white px-2 py-2 rounded-full flex items-center"
+        >
+          <BiPlus className="w-8 h-8" />
+        </button>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {books.slice((currentPage - 1) * 8, currentPage * 8).map((book) => (
           <div
@@ -86,6 +105,8 @@ const Home = () => {
             </div>
           </div>
         ))}
+
+        <AddBookModal isOpen={isModalOpen} onClose={closeModal} fetchBooks />
       </div>
       <Pagination
         currentPage={currentPage}

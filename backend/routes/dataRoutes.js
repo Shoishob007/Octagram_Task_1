@@ -10,7 +10,7 @@ const {
 } = require('../controllers/bookController');
 const upload = require('../middleware/upload');
 
-router.get('/books', getAllBooks);
+router.get('/', getAllBooks);
 
 router.post('/books', upload.single('coverImage'), createBook);
 

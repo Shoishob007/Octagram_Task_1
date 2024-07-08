@@ -9,7 +9,7 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <div>
           <Link
-            to="/books"
+            to="/"
             className="text-gray-300 hover:text-white text-lg transition hover:scale-105 duration-200"
           >
             CRUD1O1
@@ -17,7 +17,7 @@ const Navbar = () => {
         </div>
         <div>
           <Link
-            to="/books"
+            to="/"
             className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
           >
             Home
