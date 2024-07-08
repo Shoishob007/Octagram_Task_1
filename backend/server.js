@@ -10,7 +10,7 @@ const app = express();
 applyMiddleware(app);
 
 app.use('/api', dataRoutes);
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, './uploads')));
 app.use(errorHandler);
 
 

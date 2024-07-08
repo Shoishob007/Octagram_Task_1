@@ -16,7 +16,7 @@ const Home = () => {
         console.log(response);
         const { data } = response;
         console.log(data);
-        console.log(data.coverImage);
+        console.log(data[0].coverImage);
         if (response.data && Array.isArray(response.data)) {
           setBooks(data);
           const itemsPerPage = 6;
@@ -41,13 +41,13 @@ const Home = () => {
 
   return (
     <div className="container">
-      <h1>All Books</h1>
+      <h1 className="mx-auto text-center">All Books</h1>
       <div className="row">
         {books.map((book) => (
           <div key={book._id} className="col-md-4 mb-3">
             <div className="card">
               <img
-                src={book.coverImage}
+                src={`http://localhost:3000/${book.coverImage}`}
                 className="card-img-top"
                 alt={book.title}
               />
