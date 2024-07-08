@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Pagination from "../components/Pagination";
+import { BiEdit, BiTrash } from "react-icons/bi";
 
 const Home = () => {
   const [books, setBooks] = useState([]);
@@ -19,7 +20,7 @@ const Home = () => {
         console.log(data[0].coverImage);
         if (response.data && Array.isArray(response.data)) {
           setBooks(data);
-          const itemsPerPage = 6;
+          const itemsPerPage = 8;
           setTotalPages(Math.ceil(data.length / itemsPerPage));
         } else {
           console.error(
@@ -40,22 +41,48 @@ const Home = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className="mx-auto text-center">All Books</h1>
-      <div className="row">
-        {books.map((book) => (
-          <div key={book._id} className="col-md-4 mb-3">
-            <div className="card">
-              <img
-                src={`http://localhost:3000/${book.coverImage}`}
-                className="card-img-top"
-                alt={book.title}
-              />
-              <div className="card-body">
-                <h5 className="card-title">{book.title}</h5>
-                <p className="card-text">Author: {book.author}</p>
-                <p className="card-text">Genre: {book.genre}</p>
-              </div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-4xl font-bold text-center mb-8">All Books</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {books.slice((currentPage - 1) * 8, currentPage * 8).map((book) => (
+          <div
+            key={book._id}
+            className="relative group border rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300"
+          >
+            <img
+              src={`http://localhost:3000/${book.coverImage}`}
+              className="w-full h-60 cover"
+              alt={book.title}
+            />
+            <button className="absolute top-2 right-2 bg-white p-1 rounded-full hover:bg-red-500 transition-colors duration-300">
+              <svg
+                className="w-6 h-6 text-red-500 hover:text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            </button>
+            <div className="p-4 bg-white relative">
+              <h5 className="text-xl font-bold mb-2">{book.title}</h5>
+              <p className="text-gray-700 mb-1">Author: {book.author}</p>
+              <p className="text-gray-700 mb-1">Genre: {book.genre}</p>
+              <p
+                className={`text-md font-semibold ${
+                  book.stock === 0 ? "text-red-500" : "text-green-500"
+                }`}
+              >
+                Stock: {book.stock}
+              </p>
+              <button className="absolute top-2 right-2 bg-white p-1 rounded-full hover:bg-blue-900 transition-colors duration-300">
+                <BiEdit className="w-6 h-6 text-blue-700 hover:text-white" />
+              </button>
+              <button
+                className="absolute bg-white top-10 right-2 p-1 rounded-full hover:bg-red-500 transition-colors duration-300"
+                onClick={() => handleDelete(book._id)}
+              >
+                <BiTrash className="w-6 h-6 text-red-500 hover:text-white" />
+              </button>
             </div>
           </div>
         ))}
