@@ -11,15 +11,13 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/");
-        console.log(response);
         const { data } = response;
-        console.log(data);
-        console.log(data[0].coverImage);
         if (response.data && Array.isArray(response.data)) {
           setBooks(data);
           const itemsPerPage = 8;
@@ -36,19 +34,31 @@ const Home = () => {
     };
 
     fetchBooks();
-    return fetchBooks;
   }, []);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  const openModal = () => {
+  const openModal = (book) => {
+    setSelectedBook(book);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setSelectedBook(null);
+  };
+
+  const handleDelete = async (bookId) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/books/${bookId}`);
+      const updatedBooks = books.filter((book) => book._id !== bookId);
+      setBooks(updatedBooks);
+      setTotalPages(Math.ceil(updatedBooks.length / 8));
+    } catch (error) {
+      console.error("Error deleting book:", error);
+    }
   };
 
   return (
@@ -56,7 +66,7 @@ const Home = () => {
       <h1 className="text-4xl font-bold text-center mb-8">All Books</h1>
       <div className="fixed bottom-10 right-10 mb-4">
         <button
-          onClick={openModal}
+          onClick={() => openModal(null)}
           className="bg-blue-800 text-white px-2 py-2 rounded-full flex items-center"
         >
           <BiPlus className="w-8 h-8" />
@@ -93,7 +103,10 @@ const Home = () => {
               >
                 Stock: {book.stock}
               </p>
-              <button className="absolute top-2 right-2 bg-white p-1 rounded-full hover:bg-blue-900 transition-colors duration-300">
+              <button
+                className="absolute top-2 right-2 bg-white p-1 rounded-full hover:bg-blue-900 transition-colors duration-300"
+                onClick={() => openModal(book)}
+              >
                 <BiEdit className="w-6 h-6 text-blue-700 hover:text-white" />
               </button>
               <button
@@ -105,8 +118,12 @@ const Home = () => {
             </div>
           </div>
         ))}
-
-        <AddBookModal isOpen={isModalOpen} onClose={closeModal} fetchBooks />
+        <AddBookModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          fetchBooks={() => setBooks(books)}
+          book={selectedBook}
+        />
       </div>
       <Pagination
         currentPage={currentPage}

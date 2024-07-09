@@ -43,26 +43,42 @@ const createBook = async (req, res) => {
     }
 };
 
-
 const updateBook = async (req, res) => {
     try {
-        const updatedBook = await Book.findByIdAndUpdate(
-            req.params.bookId,
-            req.body,
-            { new: true }
-        );
+        const book = await Book.findById(req.params.bookId);
+        if (!book) {
+            return res.status(404).json({ message: 'Book not found' });
+        }
+
+        book.title = req.body.title || book.title;
+        book.author = req.body.author || book.author;
+        book.publishedDate = req.body.publishedDate || book.publishedDate;
+        book.genre = req.body.genre || book.genre;
+        book.stock = req.body.stock || book.stock;
+
+        if (req.file) {
+            book.coverImage = `uploads/${req.file.filename}`;
+        }
+
+        const updatedBook = await book.save();
         res.json(updatedBook);
     } catch (err) {
-        res.json({ message: err });
+        res.status(500).json({ message: err.message });
     }
 };
 
 const deleteBook = async (req, res) => {
     try {
-        const removedBook = await Book.findByIdAndRemove(req.params.bookId);
-        res.json(removedBook);
+        const book = await Book.findById(req.params.bookId);
+        if (!book) {
+            return res.status(404).json({ message: 'Book not found' });
+        }
+
+        await Book.findByIdAndDelete(req.params.bookId);
+        res.json({ message: 'Book deleted successfully' });
     } catch (err) {
-        res.json({ message: err });
+        console.error('Error in deleteBook:', err);
+        res.status(500).json({ message: err.message });
     }
 };
 
