@@ -22,13 +22,13 @@ const bookSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
+    price: {
+        type: Number,
+        required: true
+    },
     coverImage: {
         type: String,
         required: true
-    },
-    wishlist: {
-        type: Boolean,
-        default: false
     }
 });
 

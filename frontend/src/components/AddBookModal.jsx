@@ -10,6 +10,7 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
     publishedDate: "",
     genre: "",
     stock: 0,
+    price: 0,
     coverImage: null,
   });
 
@@ -18,7 +19,9 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
       setFormData({
         title: book.title,
         author: book.author,
-        publishedDate: book.publishedDate,
+        publishedDate: book.publishedDate
+          ? new Date(book.publishedDate).toISOString().split("T")[0]
+          : "",
         genre: book.genre,
         stock: book.stock,
         coverImage: null,
@@ -41,13 +44,15 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { title, author, publishedDate, genre, stock, coverImage } = formData;
+    const { title, author, publishedDate, genre, stock, coverImage, price } =
+      formData;
     const bookData = new FormData();
     bookData.append("title", title);
     bookData.append("author", author);
     bookData.append("publishedDate", publishedDate);
     bookData.append("genre", genre);
     bookData.append("stock", stock);
+    bookData.append("price", price);
     if (coverImage) {
       bookData.append("coverImage", coverImage);
     }
@@ -80,10 +85,10 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg md:w-96 w-64">
         <h2 className="text-2xl font-bold mb-4 text-center">
-          {book ? "Edit Book" : "Add New Book"}
+          {book ? "Edit Book" : "Add Book"}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -144,6 +149,21 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
                 setFormData({
                   ...formData,
                   stock: parseInt(e.target.value),
+                })
+              }
+              className="border rounded px-2 py-1 w-full"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Stock</label>
+            <input
+              type="number"
+              value={formData.price}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  price: parseFloat(e.target.value),
                 })
               }
               className="border rounded px-2 py-1 w-full"

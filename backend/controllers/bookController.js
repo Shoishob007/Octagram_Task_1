@@ -20,24 +20,22 @@ const getBookById = async (req, res) => {
 };
 
 const createBook = async (req, res) => {
-    const bookData = {
-        title: req.body.title,
-        author: req.body.author,
-        publishedDate: req.body.publishedDate,
-        genre: req.body.genre,
-        stock: req.body.stock,
-        wishlist: req.body.wishlist
-    };
 
-    if (req.file) {
-        bookData.coverImage = `uploads/${req.file.filename}`;
-    }
+    const { title, author, publishedDate, genre, stock, price } = req.body;
 
-    const book = new Book(bookData);
+    const newBook = new Book({
+        title,
+        author,
+        publishedDate,
+        genre,
+        stock,
+        price,
+        coverImage: req.file ? `uploads/${req.file.filename}` : '',
+    });
 
     try {
-        const savedBook = await book.save();
-        res.json(savedBook);
+        const savedBook = await newBook.save();
+        res.status(201).json(savedBook);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -55,6 +53,7 @@ const updateBook = async (req, res) => {
         book.publishedDate = req.body.publishedDate || book.publishedDate;
         book.genre = req.body.genre || book.genre;
         book.stock = req.body.stock || book.stock;
+        book.price = req.body.price || book.price;
 
         if (req.file) {
             book.coverImage = `uploads/${req.file.filename}`;
@@ -82,27 +81,10 @@ const deleteBook = async (req, res) => {
     }
 };
 
-const toggleWishlist = async (req, res) => {
-    try {
-        const book = await Book.findById(req.params.bookId);
-        if (!book) {
-            return res.status(404).json({ message: 'Book not found' });
-        }
-
-        book.wishlist = !book.wishlist;
-
-        const updatedBook = await book.save();
-        res.json(updatedBook);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
 module.exports = {
     getAllBooks,
     getBookById,
     createBook,
     updateBook,
-    deleteBook,
-    toggleWishlist
+    deleteBook
 };
