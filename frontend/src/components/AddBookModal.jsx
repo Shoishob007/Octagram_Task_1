@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { addBook, editBook } from "../utils/bookUtils";
 
 const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
   const [formData, setFormData] = useState({
@@ -24,6 +24,7 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
           : "",
         genre: book.genre,
         stock: book.stock,
+        price: book.price,
         coverImage: null,
       });
     } else {
@@ -33,6 +34,7 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
         publishedDate: "",
         genre: "",
         stock: 0,
+        price: 0,
         coverImage: null,
       });
     }
@@ -44,55 +46,24 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { title, author, publishedDate, genre, stock, coverImage, price } =
-      formData;
-    const bookData = new FormData();
-    bookData.append("title", title);
-    bookData.append("author", author);
-    bookData.append("publishedDate", publishedDate);
-    bookData.append("genre", genre);
-    bookData.append("stock", stock);
-    bookData.append("price", price);
-    if (coverImage) {
-      bookData.append("coverImage", coverImage);
-    }
-
-    try {
-      if (book) {
-        await axios.put(
-          `http://localhost:3000/api/books/${book._id}`,
-          bookData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-      } else {
-        await axios.post("http://localhost:3000/api/books", bookData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      }
-      fetchBooks();
-      onClose();
-    } catch (error) {
-      console.error("Error saving book:", error);
+    if (book) {
+      await editBook(book._id, formData, fetchBooks, onClose);
+    } else {
+      await addBook(formData, fetchBooks, onClose);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg md:w-96 w-64">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg md:w-96 w-72">
         <h2 className="text-2xl font-bold mb-4 text-center">
-          {book ? "Edit Book" : "Add Book"}
+          {book ? "Save Edits" : "Add Book"}
         </h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700">Title</label>
+          <div className="mb-2">
+            <label className="block text-gray-800">Title</label>
             <input
               type="text"
               value={formData.title}
@@ -103,8 +74,8 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Author</label>
+          <div className="mb-2">
+            <label className="block text-gray-800">Author</label>
             <input
               type="text
 "
@@ -116,8 +87,8 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Published Date</label>
+          <div className="mb-2">
+            <label className="block text-gray-800">Published Date</label>
             <input
               type="date"
               value={formData.publishedDate}
@@ -128,8 +99,8 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Genre</label>
+          <div className="mb-2">
+            <label className="block text-gray-800">Genre</label>
             <input
               type="text"
               value={formData.genre}
@@ -140,8 +111,8 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Stock</label>
+          <div className="mb-2">
+            <label className="block text-gray-800">Stock</label>
             <input
               type="number"
               value={formData.stock}
@@ -155,8 +126,8 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Stock</label>
+          <div className="mb-2">
+            <label className="block text-gray-800">Price</label>
             <input
               type="number"
               value={formData.price}
@@ -167,15 +138,16 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
                 })
               }
               className="border rounded px-2 py-1 w-full"
+              step="0.01"
               required
             />
           </div>
-          <div className="mb-4 relative">
-            <label htmlFor="coverImage" className="block text-gray-700">
+          <div className="mb-2 relative">
+            <label htmlFor="coverImage" className="block text-gray-800">
               Cover Image
             </label>
             <div className="mt-1 flex items-center">
-              <label className="cursor-pointer bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors duration-300">
+              <label className="cursor-pointer bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors duration-300">
                 <span>Choose a file</span>
                 <input
                   id="coverImage"
@@ -197,13 +169,13 @@ const AddBookModal = ({ isOpen, onClose, fetchBooks, book }) => {
             <button
               type="button"
               onClick={onClose}
-              className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+              className="bg-red-500 hover:bg-red-600 transition duration-150 text-white px-4 py-2 rounded mr-2"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-emerald-500 text-white px-4 py-2 rounded"
+              className="bg-emerald-500 hover:bg-emerald-600 transition duration-150 text-white px-4 py-2 rounded"
             >
               {book ? "Edit Book" : "Add Book"}
             </button>
